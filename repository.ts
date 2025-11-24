@@ -43,7 +43,7 @@ export class UsuarioRepository {
   async findAll(): Promise<Usuario[]> {
     const usuariosData = await prisma.usuario.findMany();
     
-    return usuariosData.map(usuarioData => {
+    return usuariosData.map((usuarioData: { id_usuario: number; nome: string; email: string; senha: string; saldo: number; data_criacao: string }) => {
       const usuario = new Usuario(
         usuarioData.nome,
         usuarioData.email,
@@ -134,7 +134,7 @@ export class DesenvolvedorRepository {
   async findAll(): Promise<Desenvolvedor[]> {
     const devsData = await prisma.desenvolvedor.findMany();
     
-    return devsData.map(devData => {
+    return devsData.map((devData: { id_dev: number; nome: string; pais_origem: string; site: string }) => {
       const dev = new Desenvolvedor(
         devData.nome,
         devData.pais_origem,
@@ -202,7 +202,7 @@ export class PublicadoraRepository {
   async findAll(): Promise<Publicadora[]> {
     const pubsData = await prisma.publicadora.findMany();
     
-    return pubsData.map(pubData => {
+    return pubsData.map((pubData: { id_publi: number; nome: string; pais_origem: string; site: string }) => {
       const pub = new Publicadora(
         pubData.nome,
         pubData.pais_origem,
@@ -266,7 +266,7 @@ export class GeneroRepository {
   async findAll(): Promise<Genero[]> {
     const gensData = await prisma.genero.findMany();
     
-    return gensData.map(genData => {
+    return gensData.map((genData: { id_gen: number; nome: string }) => {
       const gen = new Genero(genData.nome);
       gen.id_gen = genData.id_gen;
       return gen;
@@ -322,7 +322,7 @@ export class TagRepository {
   async findAll(): Promise<Tag[]> {
     const tagsData = await prisma.tag.findMany();
     
-    return tagsData.map(tagData => {
+    return tagsData.map((tagData: { id_tag: number; nome: string }) => {
       const tag = new Tag(tagData.nome);
       tag.id_tag = tagData.id_tag;
       return tag;
@@ -396,7 +396,7 @@ export class JogoRepository {
       }
     });
     
-    return jogosData.map(jogoData => {
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
       const jogo = new Jogo(
         jogoData.titulo,
         jogoData.descricao,
@@ -423,7 +423,7 @@ export class JogoRepository {
       }
     });
     
-    return jogosData.map(jogoData => {
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
       const jogo = new Jogo(
         jogoData.titulo,
         jogoData.descricao,
@@ -515,7 +515,7 @@ export class TransacaoRepository {
       }
     });
     
-    return transData.map(t => {
+    return transData.map((t: { id_trans: number; id_usuario: number; valor_total: number; data_trans: string }) => {
       const trans = new Transacao(
         t.id_usuario,
         t.valor_total,
@@ -538,7 +538,7 @@ export class TransacaoRepository {
       }
     });
     
-    return transData.map(t => {
+    return transData.map((t: { id_trans: number; id_usuario: number; valor_total: number; data_trans: string }) => {
       const trans = new Transacao(
         t.id_usuario,
         t.valor_total,
@@ -593,7 +593,7 @@ export class ItemTransacaoRepository {
       }
     });
     
-    return itensData.map(item => {
+    return itensData.map((item: { id_jogo: number; id_transacao: number }) => {
       return new ItemTransacao(item.id_jogo, item.id_transacao);
     });
   }
@@ -634,7 +634,7 @@ export class JogoTagRepository {
       }
     });
     
-    return jogoTagsData.map(jt => {
+    return jogoTagsData.map((jt: { id_jogo: number; id_tag: number }) => {
       return new JogoTag(jt.id_jogo, jt.id_tag);
     });
   }
@@ -675,7 +675,7 @@ export class JogoGeneroRepository {
       }
     });
     
-    return jogoGenerosData.map(jg => {
+    return jogoGenerosData.map((jg: { id_jogo: number; id_gen: number }) => {
       return new JogoGenero(jg.id_jogo, jg.id_gen);
     });
   }
@@ -716,7 +716,7 @@ export class AnaliseRepository {
       }
     });
     
-    return analisesData.map(a => {
+    return analisesData.map((a: { id_jogo: number; id_usuario: number; nota: number; texto: string | null; data_analise: string }) => {
       const analise = new Analise(
         a.id_jogo,
         a.id_usuario,
@@ -736,7 +736,7 @@ export class AnaliseRepository {
       }
     });
     
-    return analisesData.map(a => {
+    return analisesData.map((a: { id_jogo: number; id_usuario: number; nota: number; texto: string | null; data_analise: string }) => {
       const analise = new Analise(
         a.id_jogo,
         a.id_usuario,
@@ -831,7 +831,7 @@ export class BibliotecaRepository {
       }
     });
     
-    return bibliotecaData.map(b => {
+    return bibliotecaData.map((b: { id_jogo: number; id_usuario: number; tempo_jogado: number; data_compra: string }) => {
       const biblioteca = new Biblioteca(
         b.id_jogo,
         b.id_usuario,
@@ -922,7 +922,7 @@ export class CarrinhoRepository {
       }
     });
     
-    return carrinhoData.map(c => {
+    return carrinhoData.map((c: { id_jogo: number; id_usuario: number; data_adicao: string }) => {
       const carrinho = new Carrinho(
         c.id_jogo,
         c.id_usuario,
@@ -1002,7 +1002,7 @@ export class WishlistRepository {
       }
     });
     
-    return wishlistData.map(w => {
+    return wishlistData.map((w: { id_jogo: number; id_usuario: number; data_adicao: string }) => {
       const wishlist = new Wishlist(
         w.id_jogo,
         w.id_usuario,
@@ -1075,7 +1075,7 @@ export class AmizadesRepository {
       }
     });
     
-    return amizadesData.map(a => {
+    return amizadesData.map((a: { id_usuario: number; id_amigo: number; status: string; data_amizade: string }) => {
       const amizade = new Amizades(
         a.id_usuario,
         a.id_amigo,
@@ -1128,7 +1128,7 @@ export class AmizadesRepository {
       }
     });
     
-    return amizadesData.map(a => {
+    return amizadesData.map((a: { id_usuario: number; id_amigo: number; status: string; data_amizade: string }) => {
       const amizade = new Amizades(
         a.id_usuario,
         a.id_amigo,
