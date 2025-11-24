@@ -1,0 +1,225 @@
+// schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db/gamehub.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/// --- Entidades Principais ---
+
+model Usuario {
+  id_usuario       Int           @id @default(autoincrement())
+  nome             String        // REMOVIDO @db.VarChar(50)
+  email            String        @unique // REMOVIDO @db.VarChar(50)
+  senha            String        // REMOVIDO @db.VarChar(50)
+  saldo            Float
+  data_criacao     String        // REMOVIDO @db.Date - A data será armazenada como TEXT
+  
+  // Relações
+  transacoes       Transacao[]
+  itens_carrinho   Carrinho[]
+  itens_biblioteca Biblioteca[]
+  itens_wishlist   Wishlist[]
+  analises         Analise[]
+  
+  // Amizades (Relações auto-referenciadas)
+  amizades_iniciadas Amizades[] @relation("AmizadeIniciada")
+  amizades_recebidas Amizades[] @relation("AmizadeRecebida")
+
+  @@map("Usuario")
+}
+
+model Desenvolvedor {
+  id_dev      Int     @id @default(autoincrement())
+  nome        String  // REMOVIDO @db.VarChar(50)
+  pais_origem String  // REMOVIDO @db.VarChar(50)
+  site        String  // REMOVIDO @db.VarChar(50)
+
+  // Relações
+  jogos Jogo[]
+
+  @@map("Desenvolvedor")
+}
+
+model Publicadora {
+  id_publi    Int     @id @default(autoincrement())
+  nome        String  // REMOVIDO @db.VarChar(50)
+  pais_origem String  // REMOVIDO @db.VarChar(50)
+  site        String  // REMOVIDO @db.VarChar(50)
+
+  // Relações
+  jogos Jogo[]
+
+  @@map("Publicadora")
+}
+
+model Genero {
+  id_gen     Int         @id @default(autoincrement())
+  nome       String      // REMOVIDO @db.VarChar(50)
+
+  // Relações (Tabela de Junção)
+  jogo_genero JogoGenero[]
+
+  @@map("Genero")
+}
+
+model Tag {
+  id_tag  Int      @id @default(autoincrement())
+  nome    String   // REMOVIDO @db.VarChar(50)
+
+  // Relações (Tabela de Junção)
+  jogo_tag JogoTag[]
+
+  @@map("Tag")
+}
+
+model Jogo {
+  id_jogo     Int     @id @default(autoincrement())
+  titulo      String  // REMOVIDO @db.VarChar(50)
+  descricao   String  // REMOVIDO @db.VarChar(200)
+  preco       Float
+  data_lanc   String  // REMOVIDO @db.Date
+  
+  // Chaves Estrangeiras (FKs)
+  id_dev      Int
+  id_publi    Int
+  
+  // Relações
+  desenvolvedor Desenvolvedor @relation(fields: [id_dev], references: [id_dev])
+  publicadora   Publicadora   @relation(fields: [id_publi], references: [id_publi])
+  
+  itens_transacao ItemTransacao[]
+  jogo_tag        JogoTag[]
+  jogo_genero     JogoGenero[]
+  analises        Analise[]
+  itens_biblioteca Biblioteca[]
+  itens_carrinho   Carrinho[]
+  itens_wishlist   Wishlist[]
+
+  @@map("Jogo")
+}
+
+model Transacao {
+  id_trans   Int     @id @default(autoincrement())
+  id_usuario Int
+  data_trans String  // REMOVIDO @db.Date
+  valor_total Float
+
+  // Relações
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  itens   ItemTransacao[]
+
+  @@map("Transacao")
+}
+
+/// --- Tabelas de Junção/M-N (Compostas) ---
+
+model ItemTransacao {
+  id_jogo    Int
+  id_transacao Int
+  
+  // Relações
+  jogo      Jogo      @relation(fields: [id_jogo], references: [id_jogo])
+  transacao Transacao @relation(fields: [id_transacao], references: [id_trans])
+
+  @@id([id_jogo, id_transacao])
+  @@map("Item_Transacao")
+}
+
+model JogoTag {
+  id_jogo Int
+  id_tag  Int
+  
+  // Relações
+  jogo Jogo @relation(fields: [id_jogo], references: [id_jogo])
+  tag  Tag  @relation(fields: [id_tag], references: [id_tag])
+
+  @@id([id_jogo, id_tag])
+  @@map("jogo_tag")
+}
+
+model JogoGenero {
+  id_jogo Int
+  id_gen  Int
+  
+  // Relações
+  jogo   Jogo   @relation(fields: [id_jogo], references: [id_jogo])
+  genero Genero @relation(fields: [id_gen], references: [id_gen])
+
+  @@id([id_jogo, id_gen])
+  @@map("jogo_genero")
+}
+
+model Analise {
+  id_jogo     Int
+  id_usuario  Int
+  nota        Float
+  texto       String? // REMOVIDO @db.VarChar(200)
+  data_analise String  // REMOVIDO @db.Date
+  
+  // Relações
+  jogo    Jogo    @relation(fields: [id_jogo], references: [id_jogo])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@id([id_jogo, id_usuario])
+  @@map("analise")
+}
+
+model Biblioteca {
+  id_jogo       Int
+  id_usuario    Int
+  tempo_jogado Float
+  data_compra   String // REMOVIDO @db.Date
+  
+  // Relações
+  jogo    Jogo    @relation(fields: [id_jogo], references: [id_jogo])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@id([id_jogo, id_usuario])
+  @@map("biblioteca")
+}
+
+model Carrinho {
+  id_jogo      Int
+  id_usuario   Int
+  data_adicao  String // REMOVIDO @db.Date
+  
+  // Relações
+  jogo    Jogo    @relation(fields: [id_jogo], references: [id_jogo])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@id([id_jogo, id_usuario])
+  @@map("carrinho")
+}
+
+model Wishlist {
+  id_jogo      Int
+  id_usuario   Int
+  data_adicao  String // REMOVIDO @db.Date
+  
+  // Relações
+  jogo    Jogo    @relation(fields: [id_jogo], references: [id_jogo])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@id([id_jogo, id_usuario])
+  @@map("wishlist")
+}
+
+model Amizades {
+  id_usuario   Int
+  id_amigo     Int
+  data_amizade String // REMOVIDO @db.Date
+  status       String // REMOVIDO @db.VarChar(20)
+  
+  // Relações auto-referenciadas
+  iniciador Usuario @relation("AmizadeIniciada", fields: [id_usuario], references: [id_usuario])
+  amigo     Usuario @relation("AmizadeRecebida", fields: [id_amigo], references: [id_usuario])
+
+  @@id([id_usuario, id_amigo])
+  @@unique([id_amigo, id_usuario]) 
+  @@map("amizades")
+}

@@ -1,0 +1,59 @@
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Banco de dados
+db/*.db
+db/*.db-journal
+db/*.db-wal
+db/*.db-shm
+
+# Prisma
+.prisma/
+*.prisma.bak
+
+# Logs
+logs/
+*.log
+
+# Sistema Operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.cache/
+
+# Variáveis de ambiente (se houver)
+.env
+.env.local
+.env.*.local
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Coverage
+coverage/
+.nyc_output/
+
