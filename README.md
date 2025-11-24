@@ -87,7 +87,7 @@ GameHub/
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/EnriqueCNogueira/GameHub.git
 cd GameHub
 ```
 
@@ -112,7 +112,7 @@ npm start
 O projeto deve ser desenvolvido seguindo esta ordem lógica:
 
 1. ✅ **schema.prisma**: Definição de todas as tabelas e relacionamentos
-2. ⏳ **domain.ts**: Criação das interfaces TypeScript equivalentes
+2. ✅ **domain.ts**: Criação das interfaces TypeScript equivalentes
 3. ⏳ **repository.ts**: Implementação das funções de CRUD e regras de negócio
 4. ⏳ **server.ts**: Configuração do Express e criação das rotas da API
 5. ⏳ **Frontend**: Construção da interface visual e integração com a API
