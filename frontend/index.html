@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameHub - Sua Loja de Jogos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🎮 GameHub</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn" data-page="home">Loja</button>
+                <button class="nav-btn" data-page="library">Biblioteca</button>
+                <button class="nav-btn" data-page="wishlist">Lista de Desejos</button>
+                <button class="nav-btn" data-page="friends">Amigos</button>
+            </nav>
+            <div class="user-section">
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span id="userName"></span>
+                    <span class="balance" id="userBalance">R$ 0,00</span>
+                    <button class="btn-cart" id="cartBtn">
+                        🛒 Carrinho (<span id="cartCount">0</span>)
+                    </button>
+                    <button class="btn-logout" id="logoutBtn">Sair</button>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-login" id="loginBtn">Entrar</button>
+                    <button class="btn-register" id="registerBtn">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Page (Loja) -->
+        <section id="home" class="page active">
+            <div class="container">
+                <h2>Loja</h2>
+                
+                <!-- Search and Filters -->
+                <div class="search-section">
+                    <input type="text" id="searchInput" placeholder="Buscar jogos..." class="search-input">
+                    <div class="filters">
+                        <select id="genreFilter" class="filter-select">
+                            <option value="">Todos os Gêneros</option>
+                        </select>
+                        <select id="tagFilter" class="filter-select">
+                            <option value="">Todas as Tags</option>
+                        </select>
+                        <button class="btn-filter" id="clearFilters">Limpar Filtros</button>
+                    </div>
+                </div>
+
+                <!-- Games Grid -->
+                <div class="games-grid" id="gamesGrid">
+                    <!-- Games will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Library Page -->
+        <section id="library" class="page">
+            <div class="container">
+                <h2>Minha Biblioteca</h2>
+                <div class="games-grid" id="libraryGrid">
+                    <!-- Library games will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Wishlist Page -->
+        <section id="wishlist" class="page">
+            <div class="container">
+                <h2>Lista de Desejos</h2>
+                <div class="games-grid" id="wishlistGrid">
+                    <!-- Wishlist games will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Friends Page -->
+        <section id="friends" class="page">
+            <div class="container">
+                <h2>Amigos</h2>
+                <div class="friends-section">
+                    <div class="add-friend">
+                        <input type="number" id="friendIdInput" placeholder="ID do Usuário" class="input-field">
+                        <button class="btn-primary" id="addFriendBtn">Adicionar Amigo</button>
+                    </div>
+                    <div class="friends-list" id="friendsList">
+                        <!-- Friends will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="loginModal">&times;</span>
+            <h2>Entrar</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required class="input-field">
+                <input type="password" id="loginPassword" placeholder="Senha" required class="input-field">
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="registerModal">&times;</span>
+            <h2>Cadastrar</h2>
+            <form id="registerForm">
+                <input type="text" id="registerName" placeholder="Nome" required class="input-field">
+                <input type="email" id="registerEmail" placeholder="Email" required class="input-field">
+                <input type="password" id="registerPassword" placeholder="Senha" required class="input-field">
+                <input type="number" id="registerSaldo" placeholder="Saldo Inicial (opcional)" class="input-field" value="0">
+                <button type="submit" class="btn-primary">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Details Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" data-modal="gameModal">&times;</span>
+            <div id="gameDetails">
+                <!-- Game details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="cartModal">&times;</span>
+            <h2>Carrinho de Compras</h2>
+            <div id="cartItems">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div class="cart-total">
+                <strong>Total: R$ <span id="cartTotal">0,00</span></strong>
+                <button class="btn-primary" id="checkoutBtn">Finalizar Compra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="main.js"></script>
+</body>
+</html>
+
