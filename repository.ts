@@ -74,6 +74,24 @@ export class UsuarioRepository {
     return usuario;
   }
 
+  async findByNome(nome: string): Promise<Usuario | null> {
+    const usuarioData = await prisma.usuario.findFirst({
+      where: { nome }
+    });
+    
+    if (!usuarioData) return null;
+    
+    const usuario = new Usuario(
+      usuarioData.nome,
+      usuarioData.email,
+      usuarioData.senha,
+      usuarioData.saldo,
+      usuarioData.data_criacao
+    );
+    usuario.id_usuario = usuarioData.id_usuario;
+    return usuario;
+  }
+
   async save(usuario: Usuario): Promise<Usuario> {
     const usuarioData = await prisma.usuario.create({
       data: {
@@ -417,6 +435,195 @@ export class JogoRepository {
           contains: titulo
         }
       },
+      include: {
+        desenvolvedor: true,
+        publicadora: true
+      }
+    });
+    
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
+      const jogo = new Jogo(
+        jogoData.titulo,
+        jogoData.descricao,
+        jogoData.preco,
+        jogoData.data_lanc,
+        jogoData.id_dev,
+        jogoData.id_publi
+      );
+      jogo.id_jogo = jogoData.id_jogo;
+      return jogo;
+    });
+  }
+
+  async findByDesenvolvedor(nomeDev: string): Promise<Jogo[]> {
+    const jogosData = await prisma.jogo.findMany({
+      where: {
+        desenvolvedor: {
+          nome: {
+            contains: nomeDev
+          }
+        }
+      },
+      include: {
+        desenvolvedor: true,
+        publicadora: true
+      }
+    });
+    
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
+      const jogo = new Jogo(
+        jogoData.titulo,
+        jogoData.descricao,
+        jogoData.preco,
+        jogoData.data_lanc,
+        jogoData.id_dev,
+        jogoData.id_publi
+      );
+      jogo.id_jogo = jogoData.id_jogo;
+      return jogo;
+    });
+  }
+
+  async findByPublicadora(nomePubli: string): Promise<Jogo[]> {
+    const jogosData = await prisma.jogo.findMany({
+      where: {
+        publicadora: {
+          nome: {
+            contains: nomePubli
+          }
+        }
+      },
+      include: {
+        desenvolvedor: true,
+        publicadora: true
+      }
+    });
+    
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
+      const jogo = new Jogo(
+        jogoData.titulo,
+        jogoData.descricao,
+        jogoData.preco,
+        jogoData.data_lanc,
+        jogoData.id_dev,
+        jogoData.id_publi
+      );
+      jogo.id_jogo = jogoData.id_jogo;
+      return jogo;
+    });
+  }
+
+  async findByGenero(idGenero: number): Promise<Jogo[]> {
+    const jogosData = await prisma.jogo.findMany({
+      where: {
+        jogo_genero: {
+          some: {
+            id_gen: idGenero
+          }
+        }
+      },
+      include: {
+        desenvolvedor: true,
+        publicadora: true
+      }
+    });
+    
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
+      const jogo = new Jogo(
+        jogoData.titulo,
+        jogoData.descricao,
+        jogoData.preco,
+        jogoData.data_lanc,
+        jogoData.id_dev,
+        jogoData.id_publi
+      );
+      jogo.id_jogo = jogoData.id_jogo;
+      return jogo;
+    });
+  }
+
+  async findByTag(idTag: number): Promise<Jogo[]> {
+    const jogosData = await prisma.jogo.findMany({
+      where: {
+        jogo_tag: {
+          some: {
+            id_tag: idTag
+          }
+        }
+      },
+      include: {
+        desenvolvedor: true,
+        publicadora: true
+      }
+    });
+    
+    return jogosData.map((jogoData: { id_jogo: number; titulo: string; descricao: string; preco: number; data_lanc: string; id_dev: number; id_publi: number }) => {
+      const jogo = new Jogo(
+        jogoData.titulo,
+        jogoData.descricao,
+        jogoData.preco,
+        jogoData.data_lanc,
+        jogoData.id_dev,
+        jogoData.id_publi
+      );
+      jogo.id_jogo = jogoData.id_jogo;
+      return jogo;
+    });
+  }
+
+  /**
+   * Busca avançada de jogos com múltiplos filtros
+   * @param filters - Objeto com filtros opcionais: titulo, desenvolvedor, publicadora, idGenero, idTag
+   */
+  async search(filters: {
+    titulo?: string;
+    desenvolvedor?: string;
+    publicadora?: string;
+    idGenero?: number;
+    idTag?: number;
+  }): Promise<Jogo[]> {
+    const where: any = {};
+
+    if (filters.titulo) {
+      where.titulo = {
+        contains: filters.titulo
+      };
+    }
+
+    if (filters.desenvolvedor) {
+      where.desenvolvedor = {
+        nome: {
+          contains: filters.desenvolvedor
+        }
+      };
+    }
+
+    if (filters.publicadora) {
+      where.publicadora = {
+        nome: {
+          contains: filters.publicadora
+        }
+      };
+    }
+
+    if (filters.idGenero) {
+      where.jogo_genero = {
+        some: {
+          id_gen: filters.idGenero
+        }
+      };
+    }
+
+    if (filters.idTag) {
+      where.jogo_tag = {
+        some: {
+          id_tag: filters.idTag
+        }
+      };
+    }
+
+    const jogosData = await prisma.jogo.findMany({
+      where,
       include: {
         desenvolvedor: true,
         publicadora: true
@@ -1128,15 +1335,30 @@ export class AmizadesRepository {
       }
     });
     
-    return amizadesData.map((a: { id_usuario: number; id_amigo: number; status: string; data_amizade: string }) => {
-      const amizade = new Amizades(
-        a.id_usuario,
-        a.id_amigo,
-        a.status,
-        a.data_amizade
-      );
-      return amizade;
+    // Remove duplicatas: como criamos amizades bidirecionais, podemos ter duas entradas
+    // para a mesma amizade. Vamos retornar apenas uma por par de usuários.
+    const amizadesUnicas = new Map<string, Amizades>();
+    
+    amizadesData.forEach((a: { id_usuario: number; id_amigo: number; status: string; data_amizade: string }) => {
+      // Cria uma chave única para o par de usuários (ordem não importa)
+      const key1 = `${a.id_usuario}-${a.id_amigo}`;
+      const key2 = `${a.id_amigo}-${a.id_usuario}`;
+      
+      // Se já existe uma entrada com essa chave (em qualquer ordem), não adiciona
+      if (!amizadesUnicas.has(key1) && !amizadesUnicas.has(key2)) {
+        const amizade = new Amizades(
+          a.id_usuario,
+          a.id_amigo,
+          a.status,
+          a.data_amizade
+        );
+        // Usa a chave onde id_usuario é menor para garantir consistência
+        const key = a.id_usuario < a.id_amigo ? key1 : key2;
+        amizadesUnicas.set(key, amizade);
+      }
     });
+    
+    return Array.from(amizadesUnicas.values());
   }
 
   async save(amizade: Amizades): Promise<Amizades> {
@@ -1210,7 +1432,7 @@ export class GameHubService {
    * Regras:
    * - Não pode adicionar a si mesmo
    * - Não pode adicionar se já existe amizade
-   * - Cria com status 'pendente'
+   * - Cria amizades bidirecionais com status 'aceita' (amizade direta)
    */
   async addFriend(idUsuario: number, idAmigo: number): Promise<Amizades> {
     if (idUsuario === idAmigo) {
@@ -1231,8 +1453,25 @@ export class GameHubService {
       throw new Error('Usuário ou amigo não encontrado');
     }
 
-    const amizade = new Amizades(idUsuario, idAmigo, 'pendente');
-    return await this.amizadesRepo.save(amizade);
+    // Cria amizade bidirecional com status 'aceita' (amizade direta)
+    // Cria ambas as direções da amizade para que ambos os usuários vejam a amizade
+    const amizade1 = new Amizades(idUsuario, idAmigo, 'aceita');
+    const amizade2 = new Amizades(idAmigo, idUsuario, 'aceita');
+    
+    try {
+      await this.amizadesRepo.save(amizade1);
+      await this.amizadesRepo.save(amizade2);
+    } catch (error) {
+      // Se houver erro ao criar a segunda amizade, tenta remover a primeira
+      try {
+        await this.amizadesRepo.delete(idUsuario, idAmigo);
+      } catch (deleteError) {
+        // Ignora erro de delete se a primeira não foi criada
+      }
+      throw new Error('Erro ao criar amizade bidirecional: ' + (error as Error).message);
+    }
+    
+    return amizade1;
   }
 
   /**

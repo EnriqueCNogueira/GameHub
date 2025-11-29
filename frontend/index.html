@@ -21,7 +21,15 @@
             </nav>
             <div class="user-section">
                 <div class="user-info" id="userInfo" style="display: none;">
-                    <span id="userName"></span>
+                    <div class="profile-info" id="profileInfo">
+                        <div class="profile-badge">
+                            <span class="profile-icon">👤</span>
+                            <div class="profile-details">
+                                <div class="profile-id">ID: <span id="profileId">-</span></div>
+                                <div class="profile-name" id="profileName">-</div>
+                            </div>
+                        </div>
+                    </div>
                     <span class="balance" id="userBalance">R$ 0,00</span>
                     <button class="btn-cart" id="cartBtn">
                         🛒 Carrinho (<span id="cartCount">0</span>)
@@ -45,7 +53,11 @@
                 
                 <!-- Search and Filters -->
                 <div class="search-section">
-                    <input type="text" id="searchInput" placeholder="Buscar jogos..." class="search-input">
+                    <div class="search-inputs">
+                        <input type="text" id="searchInput" placeholder="Buscar por título..." class="search-input">
+                        <input type="text" id="searchDevInput" placeholder="Buscar por desenvolvedor..." class="search-input">
+                        <input type="text" id="searchPubliInput" placeholder="Buscar por publicadora..." class="search-input">
+                    </div>
                     <div class="filters">
                         <select id="genreFilter" class="filter-select">
                             <option value="">Todos os Gêneros</option>
@@ -89,12 +101,40 @@
             <div class="container">
                 <h2>Amigos</h2>
                 <div class="friends-section">
-                    <div class="add-friend">
-                        <input type="number" id="friendIdInput" placeholder="ID do Usuário" class="input-field">
-                        <button class="btn-primary" id="addFriendBtn">Adicionar Amigo</button>
+                    <div class="profile-card">
+                        <h3>Meu Perfil</h3>
+                        <div class="profile-data">
+                            <div class="profile-data-item">
+                                <span class="profile-label">ID:</span>
+                                <span class="profile-value" id="profileIdDisplay">-</span>
+                            </div>
+                            <div class="profile-data-item">
+                                <span class="profile-label">Nome:</span>
+                                <span class="profile-value" id="profileNameDisplay">-</span>
+                            </div>
+                            <div class="profile-data-item">
+                                <span class="profile-label">Email:</span>
+                                <span class="profile-value" id="profileEmailDisplay">-</span>
+                            </div>
+                            <div class="profile-data-item">
+                                <span class="profile-label">Data de Criação:</span>
+                                <span class="profile-value" id="profileDateDisplay">-</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="friends-list" id="friendsList">
-                        <!-- Friends will be loaded here -->
+                    <div class="add-friend">
+                        <h3>Adicionar Amigo</h3>
+                        <div class="add-friend-form">
+                            <input type="text" id="friendNameInput" placeholder="Digite o nome do usuário" class="input-field">
+                            <button class="btn-primary" id="addFriendBtn">Adicionar Amigo</button>
+                        </div>
+                        <p class="add-friend-hint">💡 Digite o nome exato do usuário que deseja adicionar como amigo</p>
+                    </div>
+                    <div class="friends-list-section">
+                        <h3>Meus Amigos</h3>
+                        <div class="friends-list" id="friendsList">
+                            <!-- Friends will be loaded here -->
+                        </div>
                     </div>
                 </div>
             </div>

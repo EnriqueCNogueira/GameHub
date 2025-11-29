@@ -9,7 +9,9 @@
     "test:server": "tsx test-server.ts",
     "test:basic": "tsx test-server-basic.ts",
     "start": "tsx server.ts",
-    "dev": "tsx watch server.ts"
+    "dev": "tsx watch server.ts",
+    "clear-db": "tsx clear-db.ts",
+    "seed": "tsx seed.ts"
   },
   "author": "",
   "license": "ISC",

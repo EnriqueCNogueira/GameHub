@@ -3,7 +3,7 @@
 // --- Entidades Principais ---
 
 export class Usuario {
-  id_usuario: number
+  id_usuario?: number
   nome: string
   email: string
   senha: string
@@ -40,7 +40,7 @@ export class Usuario {
 }
 
 export class Desenvolvedor {
-  id_dev: number
+  id_dev?: number
   nome: string
   pais_origem: string
   site: string
@@ -57,7 +57,7 @@ export class Desenvolvedor {
 }
 
 export class Publicadora {
-  id_publi: number
+  id_publi?: number
   nome: string
   pais_origem: string
   site: string
@@ -74,7 +74,7 @@ export class Publicadora {
 }
 
 export class Genero {
-  id_gen: number
+  id_gen?: number
   nome: string
 
   constructor(nome: string) {
@@ -83,7 +83,7 @@ export class Genero {
 }
 
 export class Tag {
-  id_tag: number
+  id_tag?: number
   nome: string
 
   constructor(nome: string) {
@@ -92,7 +92,7 @@ export class Tag {
 }
 
 export class Jogo {
-  id_jogo: number
+  id_jogo?: number
   titulo: string
   descricao: string
   preco: number
@@ -124,7 +124,7 @@ export class Jogo {
 }
 
 export class Transacao {
-  id_trans: number
+  id_trans?: number
   id_usuario: number
   data_trans: string
   valor_total: number

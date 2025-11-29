@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
 import {
   Usuario,
   Desenvolvedor,
@@ -42,6 +43,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Servir arquivos estáticos do frontend
+const frontendPath = path.join(process.cwd(), 'frontend');
+app.use(express.static(frontendPath));
 
 // Repositories
 const usuarioRepo = new UsuarioRepository();
@@ -670,8 +675,86 @@ app.get('/api/jogos', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/jogos/search?titulo=...&desenvolvedor=...&publicadora=...&idGenero=...&idTag=...
+ * Busca avançada de jogos com múltiplos filtros
+ * Todos os parâmetros são opcionais e podem ser combinados
+ * IMPORTANTE: Esta rota deve vir ANTES de /api/jogos/:id para evitar conflitos
+ */
+app.get('/api/jogos/search', async (req: Request, res: Response) => {
+  try {
+    const titulo = req.query.titulo as string;
+    const desenvolvedor = req.query.desenvolvedor as string;
+    const publicadora = req.query.publicadora as string;
+    const idGenero = req.query.idGenero ? parseInt(req.query.idGenero as string) : undefined;
+    const idTag = req.query.idTag ? parseInt(req.query.idTag as string) : undefined;
+
+    // Se nenhum filtro foi fornecido, retorna todos os jogos
+    if (!titulo && !desenvolvedor && !publicadora && !idGenero && !idTag) {
+      const jogos = await jogoRepo.findAll();
+      return res.json(jogos);
+    }
+
+    const filters: {
+      titulo?: string;
+      desenvolvedor?: string;
+      publicadora?: string;
+      idGenero?: number;
+      idTag?: number;
+    } = {};
+
+    if (titulo) filters.titulo = titulo;
+    if (desenvolvedor) filters.desenvolvedor = desenvolvedor;
+    if (publicadora) filters.publicadora = publicadora;
+    if (idGenero && !isNaN(idGenero)) filters.idGenero = idGenero;
+    if (idTag && !isNaN(idTag)) filters.idTag = idTag;
+
+    const jogos = await jogoRepo.search(filters);
+    res.json(jogos);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to search jogos', details: error });
+  }
+});
+
+/**
+ * GET /api/jogos/search/desenvolvedor?nome=...
+ * Busca jogos por desenvolvedor
+ */
+app.get('/api/jogos/search/desenvolvedor', async (req: Request, res: Response) => {
+  try {
+    const nome = req.query.nome as string;
+    if (!nome) {
+      return res.status(400).json({ error: 'Nome query parameter is required' });
+    }
+
+    const jogos = await jogoRepo.findByDesenvolvedor(nome);
+    res.json(jogos);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to search jogos by desenvolvedor', details: error });
+  }
+});
+
+/**
+ * GET /api/jogos/search/publicadora?nome=...
+ * Busca jogos por publicadora
+ */
+app.get('/api/jogos/search/publicadora', async (req: Request, res: Response) => {
+  try {
+    const nome = req.query.nome as string;
+    if (!nome) {
+      return res.status(400).json({ error: 'Nome query parameter is required' });
+    }
+
+    const jogos = await jogoRepo.findByPublicadora(nome);
+    res.json(jogos);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to search jogos by publicadora', details: error });
+  }
+});
+
+/**
  * GET /api/jogos/:id
  * Get a jogo by ID
+ * IMPORTANTE: Esta rota deve vir DEPOIS das rotas de busca para evitar conflitos
  */
 app.get('/api/jogos/:id', async (req: Request, res: Response) => {
   try {
@@ -688,24 +771,6 @@ app.get('/api/jogos/:id', async (req: Request, res: Response) => {
     res.json(jogo);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch jogo', details: error });
-  }
-});
-
-/**
- * GET /api/jogos/search?titulo=...
- * Search jogos by titulo
- */
-app.get('/api/jogos/search', async (req: Request, res: Response) => {
-  try {
-    const titulo = req.query.titulo as string;
-    if (!titulo) {
-      return res.status(400).json({ error: 'Titulo query parameter is required' });
-    }
-
-    const jogos = await jogoRepo.findByTitulo(titulo);
-    res.json(jogos);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to search jogos', details: error });
   }
 });
 
@@ -1575,7 +1640,7 @@ app.get('/api/usuarios/:idUsuario/amizades/aceitas', async (req: Request, res: R
 /**
  * POST /api/usuarios/:idUsuario/amizades
  * Add a friend (create amizade)
- * Body: { id_amigo: number }
+ * Body: { nome_amigo: string } or { id_amigo: number } (backward compatibility)
  */
 app.post('/api/usuarios/:idUsuario/amizades', async (req: Request, res: Response) => {
   try {
@@ -1584,15 +1649,33 @@ app.post('/api/usuarios/:idUsuario/amizades', async (req: Request, res: Response
       return res.status(400).json({ error: 'Invalid usuario ID' });
     }
 
-    const { id_amigo } = req.body;
-    if (!id_amigo || isNaN(id_amigo)) {
-      return res.status(400).json({ error: 'Id_amigo is required' });
+    const { nome_amigo, id_amigo } = req.body;
+    let idAmigo: number | undefined;
+
+    // Se nome_amigo foi fornecido (string não vazia), buscar pelo nome
+    if (nome_amigo && typeof nome_amigo === 'string' && nome_amigo.trim().length > 0) {
+      const amigo = await usuarioRepo.findByNome(nome_amigo.trim());
+      if (!amigo || !amigo.id_usuario) {
+        return res.status(404).json({ error: 'Usuário não encontrado com este nome' });
+      }
+      idAmigo = amigo.id_usuario;
+    } 
+    // Se id_amigo foi fornecido (backward compatibility)
+    else if (id_amigo !== undefined && id_amigo !== null && !isNaN(Number(id_amigo))) {
+      idAmigo = parseInt(String(id_amigo));
+    } 
+    
+    // Validação final
+    if (!idAmigo) {
+      return res.status(400).json({ error: 'nome_amigo ou id_amigo é obrigatório' });
     }
 
-    const amizade = await gameHubService.addFriend(idUsuario, id_amigo);
+    const amizade = await gameHubService.addFriend(idUsuario, idAmigo);
     res.status(201).json(amizade);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to add friend', details: error });
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Failed to add friend';
+    const statusCode = errorMessage.includes('não encontrado') || errorMessage.includes('já existe') || errorMessage.includes('obrigatório') ? 400 : 500;
+    res.status(statusCode).json({ error: errorMessage });
   }
 });
 
@@ -1668,13 +1751,13 @@ app.delete('/api/usuarios/:idUsuario/amizades/:idAmigo', async (req: Request, re
   }
 });
 
-// ==================== ROOT ROUTE ====================
+// ==================== API DOCUMENTATION ROUTE ====================
 
 /**
- * GET /
- * API welcome message
+ * GET /api
+ * API welcome message and documentation
  */
-app.get('/', (req: Request, res: Response) => {
+app.get('/api', (req: Request, res: Response) => {
   res.json({
     message: 'GameHub API',
     version: '1.0.0',
@@ -1734,7 +1817,9 @@ app.get('/', (req: Request, res: Response) => {
       jogos: {
         'GET /api/jogos': 'Get all jogos',
         'GET /api/jogos/:id': 'Get a jogo by ID',
-        'GET /api/jogos/search?titulo=...': 'Search jogos by titulo',
+        'GET /api/jogos/search?titulo=...&desenvolvedor=...&publicadora=...&idGenero=...&idTag=...': 'Busca avançada de jogos (todos os parâmetros são opcionais)',
+        'GET /api/jogos/search/desenvolvedor?nome=...': 'Search jogos by desenvolvedor name',
+        'GET /api/jogos/search/publicadora?nome=...': 'Search jogos by publicadora name',
         'POST /api/jogos': 'Create a new jogo',
         'PUT /api/jogos/:id': 'Update a jogo',
         'DELETE /api/jogos/:id': 'Delete a jogo',
@@ -1764,10 +1849,21 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
+// Middleware para servir o frontend (deve ser o último middleware)
+app.use((req: Request, res: Response, next: express.NextFunction) => {
+  // Se não for uma rota da API, servir o frontend
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(process.cwd(), 'frontend', 'index.html'));
+  } else {
+    next();
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`GameHub API Server is running on http://localhost:${PORT}`);
-  console.log(`API Documentation available at http://localhost:${PORT}/`);
+  console.log(`Frontend available at http://localhost:${PORT}/`);
+  console.log(`API Documentation available at http://localhost:${PORT}/api`);
 });
 
 export default app;
