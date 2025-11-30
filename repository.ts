@@ -1527,11 +1527,16 @@ export class GameHubService {
 
     // Cria transação
     const transacao = new Transacao(idUsuario, valorTotal);
-    await this.transacaoRepo.save(transacao);
+    const transacaoSalva = await this.transacaoRepo.save(transacao);
+
+    // Verifica se o ID foi definido
+    if (!transacaoSalva.id_trans) {
+      throw new Error('Erro ao criar transação: ID não foi gerado');
+    }
 
     // Cria itens da transação e adiciona à biblioteca
     for (const idJogo of jogosIds) {
-      const itemTransacao = new ItemTransacao(idJogo, transacao.id_trans);
+      const itemTransacao = new ItemTransacao(idJogo, transacaoSalva.id_trans);
       await this.itemTransacaoRepo.save(itemTransacao);
 
       // Adiciona à biblioteca
@@ -1546,7 +1551,7 @@ export class GameHubService {
     // Limpa carrinho
     await this.carrinhoRepo.deleteAllByUsuario(idUsuario);
 
-    return transacao;
+    return transacaoSalva;
   }
 
   /**
